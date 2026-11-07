@@ -124,15 +124,21 @@ RC(2,0) RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(0,10) RC(1,10) RC(2,5) RC(2,6) RC(2,7
     trackball: trackball@a {
         compatible = "pimoroni,pim447";
         reg = <0x0a>;
-        /* 速度: 6 (QMK 版 SCALE 2 の3倍)。速すぎるときは下げ、遅いときは上げる
-         * 横方向だけの速さは yr32lp.keymap の zip_x_scaler で調整 */
-        scale = <6>;
+        /* 速度: 1 カウントあたりの移動量 (linear なので回した量に比例)。
+         * 遅いときは上げ、速すぎるときは下げる。横方向だけの速さは yr32lp.keymap の zip_x_scaler */
+        scale = <12>;
+        /* 2乗の加速はしない (加速はボール側の加速モードに任せる。二重にかけると飛ぶ) */
+        linear;
         /* AZ1UBALL の加速モード: 速く転がしたときだけ移動量が最大3倍になる
          * (ゆっくり動かしたときの細かさは変わらない)。通常モードに戻すときはこの行を消す */
         az1uball-accel;
+        /* なめらか処理: 1 回分の移動を数回に分けて出す (1 = なし。大きいほどなめらかで、少し遅れる) */
+        smoothing = <3>;
         /* QMK: POINTING_DEVICE_ROTATION_270 */
         rotation = <270>;
-        poll-interval-ms = <10>;
+        /* 5ms ごとに読む。押し込みを離した直後に止める時間 = 4 回 x 5ms = 20ms */
+        poll-interval-ms = <5>;
+        debounce-polls = <4>;
     };
 };
 

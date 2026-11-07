@@ -7,6 +7,7 @@
  *   - rotation は QMK の POINTING_DEVICE_ROTATION_xx と同じ向きの定義
  * QMK と違い、I2C エラーが続いても読み取りを止めず、再初期化を繰り返す。
  * AZ1UBALL(PIM447 互換)でも使える。az1uball-accel でボール側の加速モードを ON にできる。
+ * smoothing を 2 以上にすると、1 回分の移動を数回のポーリングに分けて出す(なめらか処理)。
  *
  * SPDX-License-Identifier: MIT
  */
@@ -44,6 +45,7 @@ struct pim447_config {
     bool linear;
     bool az1uball_accel;
     uint8_t debounce_polls;
+    uint8_t smoothing;
     uint8_t rgbw[4];
 };
 
@@ -54,6 +56,9 @@ struct pim447_data {
     bool pressed;
     uint8_t debounce;
     uint8_t errors;
+    /* なめらか処理でまだ出していない移動量 */
+    int32_t pending_x;
+    int32_t pending_y;
 };
 
 static int pim447_setup(const struct device *dev) {
@@ -100,6 +105,22 @@ static int32_t pim447_offset(uint8_t negative_dir, uint8_t positive_dir, uint16_
     int32_t mag = abs(offset);
     mag = linear ? (scale * mag) : (scale * mag * mag);
     return offset < 0 ? -mag : mag;
+}
+
+/* なめらか処理: たまっている移動量の 1/n (切り上げ) を取り出す。
+ * 1 カウント分の移動を一度に出さず、数回のポーリングに分けて出す */
+static int32_t pim447_take(int32_t *pending, uint8_t n) {
+    int32_t p = *pending;
+    int32_t out;
+    if (n <= 1) {
+        out = p;
+    } else if (p > 0) {
+        out = (p + n - 1) / n;
+    } else {
+        out = -((-p + n - 1) / n);
+    }
+    *pending = p - out;
+    return out;
 }
 
 static int16_t clamp16(int32_t v) {
@@ -151,8 +172,10 @@ static void pim447_work_cb(struct k_work *work) {
 
     if (pressed) {
         data->debounce = cfg->debounce_polls;
+        data->pending_x = data->pending_y = 0;
     } else if (data->debounce > 0) {
         data->debounce--;
+        data->pending_x = data->pending_y = 0;
     } else {
         /* QMK: x = offsets(right, left), y = offsets(down, up) */
         int32_t qx = pim447_offset(buf[1], buf[0], cfg->scale, cfg->linear);
@@ -183,6 +206,11 @@ static void pim447_work_cb(struct k_work *work) {
         if (cfg->invert_y) {
             y = -y;
         }
+
+        data->pending_x += x;
+        data->pending_y += y;
+        x = pim447_take(&data->pending_x, cfg->smoothing);
+        y = pim447_take(&data->pending_y, cfg->smoothing);
 
         if (x != 0 || y != 0) {
             input_report_rel(dev, INPUT_REL_X, clamp16(x), false, K_FOREVER);
@@ -221,6 +249,7 @@ static int pim447_init(const struct device *dev) {
         .linear = DT_INST_PROP(n, linear),                                                         \
         .az1uball_accel = DT_INST_PROP(n, az1uball_accel),                                         \
         .debounce_polls = DT_INST_PROP(n, debounce_polls),                                         \
+        .smoothing = DT_INST_PROP(n, smoothing),                                                   \
         .rgbw = DT_INST_PROP(n, led_rgbw),                                                         \
     };                                                                                             \
     DEVICE_DT_INST_DEFINE(n, pim447_init, NULL, &pim447_data_##n, &pim447_config_##n,              \

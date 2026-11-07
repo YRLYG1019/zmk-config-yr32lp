@@ -38,6 +38,13 @@ properties:
     default: 2
     description: Number of polls to ignore motion after the ball is released.
 
+  smoothing:
+    type: int
+    default: 1
+    description: |
+      Spread each movement over several polls. Every poll outputs 1/N
+      (rounded up) of the movement not yet reported. 1 = off.
+
   led-rgbw:
     type: uint8-array
     default: [0, 0, 0, 0]
