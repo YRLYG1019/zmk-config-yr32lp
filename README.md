@@ -44,12 +44,14 @@ ZMK Studio を USB で使えるようにしてあります(ロック解除キー
 trackball: trackball@a {
     compatible = "pimoroni,pim447";
     reg = <0x0a>;
-    scale = <6>;          // 速度(QMK版と同じ速さ=2。上げると速く、下げると細かく)
+    scale = <12>;         // 速度 = 1 カウントあたりの移動量(上げると速く、下げると細かく)
+    linear;               // 回した量に比例(消すと QMK と同じ2乗加速。加速モードと重なると飛ぶ)
     az1uball-accel;       // AZ1UBALL の加速モード(速く転がしたときだけ最大3倍。消すと通常モード)
+    smoothing = <3>;      // なめらか処理(1 = なし。大きいほどなめらかで、少し遅れる)
     rotation = <270>;     // QMK の POINTING_DEVICE_ROTATION_270
-    poll-interval-ms = <10>;
+    poll-interval-ms = <5>;  // ボールを読む間隔
+    debounce-polls = <4>;    // 押し込みを離した直後に止める回数(4 x 5ms = 20ms)
     // invert-x; invert-y;  // 向きを反転したいとき
-    // linear;              // 2乗加速をやめたいとき
     // led-rgbw = [00 00 00 10];  // ボールの LED(R G B W。PIM447 のみ。AZ1UBALL は LED なし)
 };
 ```
@@ -61,7 +63,7 @@ trackball: trackball@a {
 ### スクロール(yr32lp.keymap)
 
 Fn レイヤー中(C か D を長押し)は、トラックボールで画面スクロールします(ボールを上 = 上にスクロール)。
-速さは `&trackball_listener` の `<&zip_scroll_scaler 1 24>` で調整します(速すぎるときは 24 を大きく、遅すぎるときは小さく)。
+速さは `&trackball_listener` の `<&zip_scroll_scaler 1 48>` で調整します(速すぎるときは 48 を大きく、遅すぎるときは小さく)。
 ※ overlay の scale を変えるとスクロールの速さも同じ割合で変わります。
 
 ## QMK版との違い
