@@ -124,10 +124,11 @@ RC(2,0) RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(0,10) RC(1,10) RC(2,5) RC(2,6) RC(2,7
     trackball: trackball@a {
         compatible = "pimoroni,pim447";
         reg = <0x0a>;
-        /* 速度: 最大 (QMK の CPI 上限 65535 と同じ速さ = QMK 版 SCALE 2 の約4倍)
-         * 速すぎるときは数字を下げる (QMK 版と同じ速さは 2) */
+        /* 速度: 12 (QMK 版 SCALE 2 の6倍。QMK の上限 8 より速い。ZMK 版に上限は無い)
+         * 速すぎるときは数字を下げる (QMK 版と同じ速さは 2)
+         * 横方向だけの速さは yr32lp.keymap の zip_x_scaler で調整 */
         /* QMK: POINTING_DEVICE_ROTATION_270 */
-        scale = <8>;
+        scale = <12>;
         rotation = <270>;
         poll-interval-ms = <10>;
     };
