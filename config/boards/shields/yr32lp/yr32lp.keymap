@@ -76,8 +76,8 @@
             display-name = "Fn";
             bindings = <
 &kp F1     &kp F2         &kp F3          &kp F4          &kp F5                                        &kp F6         &kp F7          &kp F8          &kp F9         &kp F10
-&kp LCTRL  &trans         &trans          &trans          &trans                                        &trans         &trans          &trans          &trans         &kp RCTRL
-&kp LSHFT  &trans         &trans          &trans          &trans          &bootloader    &trans         &rgb_ug RGB_TOG &rgb_ug RGB_EFF &rgb_ug RGB_BRI &rgb_ug RGB_BRD &kp RSHFT
+&kp LCTRL  &mkp MCLK      &mkp RCLK       &mkp LCLK       &kp F11                                       &trans         &trans          &trans          &trans         &kp RCTRL
+&kp LSHFT  &mkp MB4       &mkp MB5        &trans          &kp F12         &bootloader    &trans         &rgb_ug RGB_TOG &rgb_ug RGB_EFF &rgb_ug RGB_BRI &rgb_ug RGB_BRD &kp RSHFT
             >;
         };
 
