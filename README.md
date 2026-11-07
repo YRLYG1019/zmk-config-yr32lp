@@ -10,6 +10,15 @@ QMK版 (`../qmk用`) を ZMK に移植したものです。
 
 `firmware/yr32lp_rp2040_zero.uf2`
 
+### トラックボール調整用(記録用)
+
+`firmware/yr32lp_rp2040_zero_trackball_log.uf2`
+
+ボールの生のカウント(上下左右)を 5ms ごとに USB シリアルへ出します。
+YRキーマップエディターのフォルダにある `trackball-log.html` で受け取り、CSV に保存できます
+(http://localhost:3000/trackball-log.html)。
+このファームでは ZMK Studio(エディターの USB 接続)は使えません。終わったら通常の uf2 に戻してください。
+
 ### 書き込み方法
 1. RP2040-Zero の **BOOT** ボタンを押しながら USB ケーブルを挿す
    (ZMK 書き込み後は、C か D を長押し + 左親指の内側キーでも入れます)
