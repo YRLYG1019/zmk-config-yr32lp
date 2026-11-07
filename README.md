@@ -3,7 +3,7 @@
 QMK版 (`../qmk用`) を ZMK に移植したものです。
 
 - マイコン: Waveshare RP2040-Zero(USB 有線)
-- トラックボール: Pimoroni PIM447(I2C1 SDA=GP2 / SCL=GP3)
+- トラックボール: AZ1UBALL(PIM447 互換 / I2C1 SDA=GP2 / SCL=GP3)
 - LED: WS2812 × 30(GP0)
 
 ## できあがった uf2
@@ -35,7 +35,7 @@ ZMK Studio を USB で使えるようにしてあります(ロック解除キー
 | `config/boards/shields/yr32lp/yr32lp.conf` | 機能設定(ポインティング・RGB) |
 | `config/west.yml` | ZMK のバージョン(main のコミットに固定) |
 | `build.yaml` | ビルド対象 `rp2040_zero//zmk` + `yr32lp` |
-| `drivers/input/input_pim447.c` ほか | PIM447 ドライバ(ZMK 本体に無いので自作。QMK と同じ計算方法) |
+| `drivers/input/input_pim447.c` ほか | PIM447 / AZ1UBALL ドライバ(ZMK 本体に無いので自作。QMK と同じ計算方法) |
 | `.github/workflows/build.yml` | GitHub Actions でビルドする場合の設定 |
 
 ## トラックボールの調整(yr32lp.overlay)
@@ -44,12 +44,13 @@ ZMK Studio を USB で使えるようにしてあります(ロック解除キー
 trackball: trackball@a {
     compatible = "pimoroni,pim447";
     reg = <0x0a>;
-    scale = <12>;         // 速度(上限なし / QMK版の上限=8 / QMK版と同じ速さ=2)
+    scale = <6>;          // 速度(QMK版と同じ速さ=2。上げると速く、下げると細かく)
+    az1uball-accel;       // AZ1UBALL の加速モード(速く転がしたときだけ最大3倍。消すと通常モード)
     rotation = <270>;     // QMK の POINTING_DEVICE_ROTATION_270
     poll-interval-ms = <10>;
     // invert-x; invert-y;  // 向きを反転したいとき
     // linear;              // 2乗加速をやめたいとき
-    // led-rgbw = [00 00 00 10];  // ボールの LED(R G B W)
+    // led-rgbw = [00 00 00 10];  // ボールの LED(R G B W。PIM447 のみ。AZ1UBALL は LED なし)
 };
 ```
 
@@ -60,7 +61,7 @@ trackball: trackball@a {
 ### スクロール(yr32lp.keymap)
 
 Fn レイヤー中(C か D を長押し)は、トラックボールで画面スクロールします(ボールを上 = 上にスクロール)。
-速さは `&trackball_listener` の `<&zip_scroll_scaler 1 48>` で調整します(速すぎるときは 48 を大きく、遅すぎるときは小さく)。
+速さは `&trackball_listener` の `<&zip_scroll_scaler 1 24>` で調整します(速すぎるときは 24 を大きく、遅すぎるときは小さく)。
 ※ overlay の scale を変えるとスクロールの速さも同じ割合で変わります。
 
 ## QMK版との違い
@@ -71,7 +72,7 @@ Fn レイヤー中(C か D を長押し)は、トラックボールで画面ス�
 - Fn レイヤー(C か D を長押し)に次のキーを追加しています。
   - 左親指の内側キー: ブートローダー(書き込みモード)
   - 右下段 G / D / M / J の位置: LED ON/OFF・効果切替・明るさ+・明るさ−
-- PIM447 の通信エラーが続いても止まらず、自動で再接続します(QMK は 10 回で停止)。
+- トラックボールの通信エラーが続いても止まらず、自動で再接続します(QMK は 10 回で停止)。
 
 ## 自分でビルドする方法
 
