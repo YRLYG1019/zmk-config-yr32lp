@@ -3,4 +3,9 @@ if SHIELD_YR32LP
 config ZMK_KEYBOARD_NAME
     default "yr32lp"
 
+# ZMK 本体の rp2040_zero//zmk(ZMK 用のボード定義)に ZMK_BOARD_COMPAT が付いていないため、
+# GitHub Actions の「ZMK 対応ボードか」の確認で止まらないようにここで付ける
+config ZMK_BOARD_COMPAT
+    default y if BOARD_RP2040_ZERO_RP2040_ZMK
+
 endif
