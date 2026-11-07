@@ -90,6 +90,8 @@ struct pim447_data {
     /* 逆向きノイズ除去用 */
     struct pim447_dir dir_x;
     struct pim447_dir dir_y;
+    /* 調整用の記録の通し番号(抜けがあれば記録が欠けている) */
+    uint32_t log_seq;
 };
 
 static int pim447_setup(const struct device *dev) {
@@ -270,6 +272,9 @@ static void pim447_work_cb(struct k_work *work) {
     if (pressed != data->pressed) {
         data->pressed = pressed;
         input_report_key(dev, INPUT_BTN_0, pressed ? 1 : 0, true, K_FOREVER);
+#if IS_ENABLED(CONFIG_INPUT_PIM447_LOG_RAW)
+        LOG_INF("SW,%u,%u,%d", data->log_seq++, k_uptime_get_32(), pressed ? 1 : 0);
+#endif
     }
 
     if (pressed) {
@@ -310,6 +315,7 @@ static void pim447_work_cb(struct k_work *work) {
         if (cfg->invert_y) {
             y = -y;
         }
+        int32_t raw_x = x, raw_y = y;
 
         if (cfg->reject_reverse_ms > 0) {
             int64_t now = k_uptime_get();
@@ -318,6 +324,7 @@ static void pim447_work_cb(struct k_work *work) {
             y = pim447_reject_reverse(y, &data->dir_y, now, cfg->reject_reverse_ms,
                                       cfg->reverse_counts);
         }
+        int32_t filt_x = x, filt_y = y;
         uint16_t pct = pim447_accel_percent(cfg, data, x, y);
         x = pim447_move(x, cfg->scale, cfg->linear, pct);
         y = pim447_move(y, cfg->scale, cfg->linear, pct);
@@ -326,6 +333,20 @@ static void pim447_work_cb(struct k_work *work) {
         data->pending_y += y;
         x = pim447_take(&data->pending_x, cfg->smoothing);
         y = pim447_take(&data->pending_y, cfg->smoothing);
+
+#if IS_ENABLED(CONFIG_INPUT_PIM447_LOG_RAW)
+        /* 調整用の記録: 生カウント(左,右,上,下)→ 回転後 → ノイズ除去後 → 倍率 → 出力 */
+        if (buf[0] || buf[1] || buf[2] || buf[3] || x || y) {
+            LOG_INF("RAW,%u,%u,%u,%u,%u,%u,%d,%d,%d,%d,%u,%d,%d", data->log_seq++,
+                    k_uptime_get_32(), buf[0], buf[1], buf[2], buf[3], raw_x, raw_y, filt_x,
+                    filt_y, pct, x, y);
+        }
+#else
+        ARG_UNUSED(raw_x);
+        ARG_UNUSED(raw_y);
+        ARG_UNUSED(filt_x);
+        ARG_UNUSED(filt_y);
+#endif
 
         if (x != 0 || y != 0) {
             input_report_rel(dev, INPUT_REL_X, clamp16(x), false, K_FOREVER);

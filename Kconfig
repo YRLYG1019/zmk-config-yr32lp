@@ -4,3 +4,11 @@ config INPUT_PIM447
     depends on DT_HAS_PIMORONI_PIM447_ENABLED
     depends on INPUT
     select I2C
+
+config INPUT_PIM447_LOG_RAW
+    bool "Log raw PIM447 / AZ1UBALL counts (for tuning)"
+    default n
+    depends on INPUT_PIM447 && LOG
+    help
+      Log one "RAW,..." line per poll with movement: the four raw direction
+      counts and each processing step. Use with the zmk-usb-logging snippet.
