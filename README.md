@@ -45,8 +45,14 @@ trackball: trackball@a {
     compatible = "pimoroni,pim447";
     reg = <0x0a>;
     scale = <12>;         // 速度 = 1 カウントあたりの移動量(上げると速く、下げると細かく)
-    linear;               // 回した量に比例(消すと QMK と同じ2乗加速。加速モードと重なると飛ぶ)
-    az1uball-accel;       // AZ1UBALL の加速モード(速く転がしたときだけ最大3倍。消すと通常モード)
+    linear;               // 回した量に比例(消すと QMK と同じ2乗加速)
+    az1uball;             // AZ1UBALL: 起動時にボールを通常モードにする
+    // az1uball-accel;    // ボール側の加速モード(反対側センサーのノイズも3倍に数え、逆に動くことがあるので使わない)
+    accel-window-polls = <8>;   // 加速: 直近 8 回(40ms)の移動量(上下・左右を差し引いた後)で倍率を決める(0 = 加速なし)
+    accel-step-percent = <100>; //   1 カウント増えるごとに +100%
+    accel-max-percent = <300>;  //   上限 300%(速く転がしたときの伸びを強くするなら上げる)
+    reject-reverse-ms = <100>;  // 逆向きノイズ除去: 動いてから 100ms 以内の逆向きは保留(0 = なし)
+    reverse-counts = <4>;       //   続けて 4 カウント来たら本当の切り返しとして保留分ごと通す
     smoothing = <3>;      // なめらか処理(1 = なし。大きいほどなめらかで、少し遅れる)
     rotation = <270>;     // QMK の POINTING_DEVICE_ROTATION_270
     poll-interval-ms = <5>;  // ボールを読む間隔
