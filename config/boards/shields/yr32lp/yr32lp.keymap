@@ -36,16 +36,21 @@
     quick-tap-ms = <150>;
 };
 
-/* Fn レイヤー中(C か D を長押し)はトラックボールで画面スクロール
- * ボールを上に転がす = 上にスクロール。速さは zip_scroll_scaler の 1 32 (= 1/32) で調整
- * (速すぎるときは 32 を大きく、遅すぎるときは小さくする) */
+/* トラックボール
+ * ・カーソルの横方向だけ 1.5 倍 (zip_x_scaler 3 2 = 3/2。横を速くするなら 2 1 など)
+ *   全体の速さは yr32lp.overlay の scale
+ * ・Fn レイヤー中(C か D を長押し)は画面スクロール
+ *   ボールを上に転がす = 上にスクロール。速さは zip_scroll_scaler の 1 48 (= 1/48) で調整
+ *   (速すぎるときは 48 を大きく、遅すぎるときは小さくする) */
 &trackball_listener {
+    input-processors = <&zip_x_scaler 3 2>;
+
     scroller {
         layers = <FN>;
         input-processors =
             <&zip_xy_transform INPUT_TRANSFORM_Y_INVERT>,
             <&zip_xy_to_scroll_mapper>,
-            <&zip_scroll_scaler 1 32>;
+            <&zip_scroll_scaler 1 48>;
     };
 };
 
