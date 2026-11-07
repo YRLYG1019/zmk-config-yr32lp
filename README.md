@@ -44,7 +44,7 @@ ZMK Studio を USB で使えるようにしてあります(ロック解除キー
 trackball: trackball@a {
     compatible = "pimoroni,pim447";
     reg = <0x0a>;
-    scale = <8>;          // 速度(最大=8 / QMK版と同じ速さ=2)
+    scale = <12>;         // 速度(上限なし / QMK版の上限=8 / QMK版と同じ速さ=2)
     rotation = <270>;     // QMK の POINTING_DEVICE_ROTATION_270
     poll-interval-ms = <10>;
     // invert-x; invert-y;  // 向きを反転したいとき
@@ -53,10 +53,15 @@ trackball: trackball@a {
 };
 ```
 
+### 横方向の速さ(yr32lp.keymap)
+
+カーソルの横方向だけ 1.5 倍にしています。`&trackball_listener` の `<&zip_x_scaler 3 2>`(= 3/2)で調整します(2 倍なら `2 1`)。
+
 ### スクロール(yr32lp.keymap)
 
 Fn レイヤー中(C か D を長押し)は、トラックボールで画面スクロールします(ボールを上 = 上にスクロール)。
-速さは `&trackball_listener` の `<&zip_scroll_scaler 1 32>` で調整します(速すぎるときは 32 を大きく、遅すぎるときは小さく)。
+速さは `&trackball_listener` の `<&zip_scroll_scaler 1 48>` で調整します(速すぎるときは 48 を大きく、遅すぎるときは小さく)。
+※ overlay の scale を変えるとスクロールの速さも同じ割合で変わります。
 
 ## QMK版との違い
 
