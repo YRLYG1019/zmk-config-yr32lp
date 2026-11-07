@@ -1,0 +1,10 @@
+file_format: "1"
+id: yr32lp
+name: yr32lp
+type: shield
+url: https://github.com/YRLYG1019
+requires: [rp2040_zero]
+features:
+  - keys
+  - pointing
+  - underglow

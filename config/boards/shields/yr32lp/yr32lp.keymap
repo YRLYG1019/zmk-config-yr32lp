@@ -1,0 +1,102 @@
+/*
+ * yr32lp keymap (QMK版 qmk用/keymaps/via/keymap.c を ZMK に移植)
+ *
+ * キー番号(コンボで使用)
+ *   0  1  2  3  4             5  6  7  8  9
+ *  10 11 12 13 14            15 16 17 18 19
+ *  20 21 22 23 24  25  26    27 28 29 30 31
+ *
+ * ※QMK の MT(MO(1),KC_V) などは、QMK では実際には Ctrl/Shift のモッドタップに
+ *   なってしまう書き方のため、意図どおりの「レイヤータップ(&lt)」で実装しています。
+ */
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/pointing.h>
+#include <dt-bindings/zmk/rgb.h>
+
+#define BASE 0
+#define SYM  1
+#define FN   2
+#define NUM  3
+#define MOUS 4
+
+/* QMK の既定 (TAPPING_TERM 200 / ホールドは押し続けたときだけ) に近い設定 */
+&mt {
+    flavor = "tap-preferred";
+    tapping-term-ms = <200>;
+    quick-tap-ms = <150>;
+};
+
+&lt {
+    flavor = "tap-preferred";
+    tapping-term-ms = <200>;
+    quick-tap-ms = <150>;
+};
+
+/ {
+    combos {
+        compatible = "zmk,combos";
+        combo_enter  { timeout-ms = <50>; key-positions = <17 18>; bindings = <&kp ENTER>; };      // N + S
+        combo_bspc   { timeout-ms = <50>; key-positions = <16 17>; bindings = <&kp BSPC>; };       // T + N
+        combo_space  { timeout-ms = <50>; key-positions = <11 12>; bindings = <&kp SPACE>; };      // I + A
+        combo_tab    { timeout-ms = <50>; key-positions = <12 13>; bindings = <&kp TAB>; };        // A + O
+        combo_sspc   { timeout-ms = <50>; key-positions = <1 2>;   bindings = <&kp LS(SPACE)>; };  // L + U
+        combo_esc    { timeout-ms = <50>; key-positions = <8 9>;   bindings = <&kp ESC>; };        // Y + P
+        combo_home   { timeout-ms = <50>; key-positions = <15 16>; bindings = <&kp HOME>; };       // K + T
+        combo_end    { timeout-ms = <50>; key-positions = <27 28>; bindings = <&kp END>; };        // G + D
+        combo_pgup   { timeout-ms = <50>; key-positions = <28 29>; bindings = <&kp PG_UP>; };      // D + M
+        combo_pgdn   { timeout-ms = <50>; key-positions = <29 30>; bindings = <&kp PG_DN>; };      // M + J
+        combo_ins    { timeout-ms = <50>; key-positions = <6 7>;   bindings = <&kp INS>; };        // W + R
+        combo_caps   { timeout-ms = <50>; key-positions = <0 1>;   bindings = <&kp CAPS>; };       // Q + L
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        base_layer {
+            display-name = "Base";
+            bindings = <
+&kp Q      &kp L          &kp U           &kp COMMA       &kp DOT                                       &kp F          &kp W           &kp R           &kp Y          &kp P
+&kp E      &mt LALT I     &mt LCTRL A     &mt LSHFT O     &mt LGUI MINUS                                &mt RGUI K     &mt RSHFT T     &mt RCTRL N     &mt RALT S     &kp H
+&kp SLASH  &kp Z          &kp X           &lt FN C        &lt SYM V       &kp LA(GRAVE)  &to NUM        &lt SYM G      &lt FN D        &kp M           &kp J          &kp B
+            >;
+        };
+
+        sym_layer {
+            display-name = "Sym";
+            bindings = <
+&kp N1     &kp N2         &kp N3          &kp N4          &kp N5                                        &kp N6         &kp N7          &kp N8          &kp N9         &kp N0
+&kp LCTRL  &kp KP_DIVIDE  &kp KP_MULTIPLY &kp DOT         &kp EQUAL                                     &kp LEFT       &kp DOWN        &kp UP          &kp RIGHT      &kp RCTRL
+&kp LSHFT  &kp KP_MINUS   &kp BSLH        &kp SQT         &kp GRAVE       &trans         &trans         &kp DEL        &trans          &kp LBKT        &kp RBKT       &kp RSHFT
+            >;
+        };
+
+        fn_layer {
+            display-name = "Fn";
+            bindings = <
+&kp F1     &kp F2         &kp F3          &kp F4          &kp F5                                        &kp F6         &kp F7          &kp F8          &kp F9         &kp F10
+&kp LCTRL  &trans         &trans          &trans          &trans                                        &trans         &trans          &trans          &trans         &kp RCTRL
+&kp LSHFT  &trans         &trans          &trans          &trans          &bootloader    &trans         &rgb_ug RGB_TOG &rgb_ug RGB_EFF &rgb_ug RGB_BRI &rgb_ug RGB_BRD &kp RSHFT
+            >;
+        };
+
+        num_layer {
+            display-name = "Num";
+            bindings = <
+&trans     &trans         &trans          &trans          &trans                                        &kp KP_MINUS   &kp KP_N7       &kp KP_N8       &kp KP_N9      &kp KP_DIVIDE
+&kp LCTRL  &mkp MCLK      &mkp RCLK       &mkp LCLK       &kp ENTER                                     &kp KP_PLUS    &kp KP_N4       &kp KP_N5       &kp KP_N6      &kp KP_MULTIPLY
+&kp LSHFT  &mkp MB4       &mkp MB5        &trans          &mt RSHFT SEMI  &trans         &to BASE       &kp KP_N0      &kp KP_N1       &kp KP_N2       &kp KP_N3      &kp KP_DOT
+            >;
+        };
+
+        mouse_layer {
+            display-name = "Mouse";
+            bindings = <
+&trans     &trans         &trans          &trans          &trans                                        &trans         &trans          &trans          &trans         &trans
+&trans     &mkp MCLK      &mkp RCLK       &mkp LCLK       &trans                                        &trans         &trans          &trans          &trans         &trans
+&trans     &mkp MB4       &mkp MB5        &trans          &trans          &trans         &trans         &trans         &trans          &trans          &trans         &trans
+            >;
+        };
+    };
+};

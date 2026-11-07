@@ -1,0 +1,44 @@
+description: |
+  Pimoroni PIM447 Trackball Breakout (I2C, default address 0x0A).
+  Reports INPUT_REL_X / INPUT_REL_Y and INPUT_BTN_0 (ball click).
+
+compatible: "pimoroni,pim447"
+
+include: i2c-device.yaml
+
+properties:
+  poll-interval-ms:
+    type: int
+    default: 10
+    description: Polling interval in milliseconds.
+
+  scale:
+    type: int
+    default: 2
+    description: Same meaning as QMK PIMORONI_TRACKBALL_SCALE.
+
+  rotation:
+    type: int
+    default: 0
+    enum: [0, 90, 180, 270]
+    description: Same direction definition as QMK POINTING_DEVICE_ROTATION_xx.
+
+  invert-x:
+    type: boolean
+
+  invert-y:
+    type: boolean
+
+  linear:
+    type: boolean
+    description: Disable QMK-style quadratic acceleration.
+
+  debounce-polls:
+    type: int
+    default: 2
+    description: Number of polls to ignore motion after the ball is released.
+
+  led-rgbw:
+    type: uint8-array
+    default: [0, 0, 0, 0]
+    description: Trackball LED color (R, G, B, W) set at startup.

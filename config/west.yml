@@ -1,0 +1,12 @@
+manifest:
+  remotes:
+    - name: zmkfirmware
+      url-base: https://github.com/zmkfirmware
+  projects:
+    - name: zmk
+      remote: zmkfirmware
+      # 動作確認したコミットに固定 (2026-11-07 時点の main)。最新を使うなら main に変更
+      revision: 4dd95d7840eb3d5a3f59bb29fbf1ab054715ef85
+      import: app/west.yml
+  self:
+    path: config

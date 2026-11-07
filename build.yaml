@@ -1,0 +1,5 @@
+---
+include:
+  - board: rp2040_zero//zmk
+    shield: yr32lp
+    artifact-name: yr32lp_rp2040_zero

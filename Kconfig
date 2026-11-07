@@ -1,0 +1,6 @@
+config INPUT_PIM447
+    bool "Pimoroni PIM447 trackball input driver"
+    default y
+    depends on DT_HAS_PIMORONI_PIM447_ENABLED
+    depends on INPUT
+    select I2C

@@ -1,0 +1,6 @@
+if SHIELD_YR32LP
+
+config ZMK_KEYBOARD_NAME
+    default "yr32lp"
+
+endif
