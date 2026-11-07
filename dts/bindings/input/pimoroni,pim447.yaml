@@ -42,3 +42,10 @@ properties:
     type: uint8-array
     default: [0, 0, 0, 0]
     description: Trackball LED color (R, G, B, W) set at startup.
+
+  az1uball-accel:
+    type: boolean
+    description: |
+      AZ1UBALL only. Send command 0x91 at startup to enable the ball's own
+      acceleration mode (counts 1/2/3 per edge depending on rotation speed).
+      Without it the ball stays in normal mode (0x90, 1 per edge).

@@ -105,7 +105,7 @@ RC(2,0) RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(0,10) RC(1,10) RC(2,5) RC(2,6) RC(2,7
 &adc  { status = "disabled"; };
 &i2c0 { status = "disabled"; };
 
-/* ---- PIM447: I2C1  SDA=GP2 / SCL=GP3 (QMK: I2C1_SDA_PIN GP2 / I2C1_SCL_PIN GP3) ---- */
+/* ---- AZ1UBALL (PIM447 互換): I2C1  SDA=GP2 / SCL=GP3 (QMK: I2C1_SDA_PIN GP2 / I2C1_SCL_PIN GP3) ---- */
 &i2c1_default {
     group1 {
         pinmux = <I2C1_SDA_P2>;
@@ -124,11 +124,13 @@ RC(2,0) RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(0,10) RC(1,10) RC(2,5) RC(2,6) RC(2,7
     trackball: trackball@a {
         compatible = "pimoroni,pim447";
         reg = <0x0a>;
-        /* 速度: 12 (QMK 版 SCALE 2 の6倍。QMK の上限 8 より速い。ZMK 版に上限は無い)
-         * 速すぎるときは数字を下げる (QMK 版と同じ速さは 2)
+        /* 速度: 6 (QMK 版 SCALE 2 の3倍)。速すぎるときは下げ、遅いときは上げる
          * 横方向だけの速さは yr32lp.keymap の zip_x_scaler で調整 */
+        scale = <6>;
+        /* AZ1UBALL の加速モード: 速く転がしたときだけ移動量が最大3倍になる
+         * (ゆっくり動かしたときの細かさは変わらない)。通常モードに戻すときはこの行を消す */
+        az1uball-accel;
         /* QMK: POINTING_DEVICE_ROTATION_270 */
-        scale = <12>;
         rotation = <270>;
         poll-interval-ms = <10>;
     };

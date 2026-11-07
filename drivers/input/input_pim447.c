@@ -6,6 +6,7 @@
  *   - ボールを押している間は移動を止め、離した直後も少しの間止める(誤移動防止)
  *   - rotation は QMK の POINTING_DEVICE_ROTATION_xx と同じ向きの定義
  * QMK と違い、I2C エラーが続いても読み取りを止めず、再初期化を繰り返す。
+ * AZ1UBALL(PIM447 互換)でも使える。az1uball-accel でボール側の加速モードを ON にできる。
  *
  * SPDX-License-Identifier: MIT
  */
@@ -26,6 +27,8 @@ LOG_MODULE_REGISTER(pim447, CONFIG_INPUT_LOG_LEVEL);
 #define PIM447_REG_CHIP_ID_L 0xFA
 #define PIM447_CHIP_ID 0xBA11
 #define PIM447_SWITCH_STATE 0x80
+/* AZ1UBALL: カウント方式の切替コマンド (0x90 = 通常 / 0x91 = 加速モード) */
+#define AZ1UBALL_CMD_ACCEL 0x91
 
 #define PIM447_ERROR_LIMIT 10
 #define PIM447_RETRY_MS 500
@@ -39,6 +42,7 @@ struct pim447_config {
     bool invert_x;
     bool invert_y;
     bool linear;
+    bool az1uball_accel;
     uint8_t debounce_polls;
     uint8_t rgbw[4];
 };
@@ -72,6 +76,16 @@ static int pim447_setup(const struct device *dev) {
     ret = i2c_write_dt(&cfg->i2c, led, sizeof(led));
     if (ret < 0) {
         return ret;
+    }
+
+    /* AZ1UBALL の加速モード(速く回したときだけ 1 回の検知で 2〜3 カウント)。
+     * ボール側は先頭 1 バイトだけを見る。再初期化のたびに送り直す */
+    if (cfg->az1uball_accel) {
+        uint8_t cmd[2] = {AZ1UBALL_CMD_ACCEL, 0x00};
+        ret = i2c_write_dt(&cfg->i2c, cmd, sizeof(cmd));
+        if (ret < 0) {
+            return ret;
+        }
     }
 
     /* 起動前にたまったカウントを読み捨てる */
@@ -205,6 +219,7 @@ static int pim447_init(const struct device *dev) {
         .invert_x = DT_INST_PROP(n, invert_x),                                                     \
         .invert_y = DT_INST_PROP(n, invert_y),                                                     \
         .linear = DT_INST_PROP(n, linear),                                                         \
+        .az1uball_accel = DT_INST_PROP(n, az1uball_accel),                                         \
         .debounce_polls = DT_INST_PROP(n, debounce_polls),                                         \
         .rgbw = DT_INST_PROP(n, led_rgbw),                                                         \
     };                                                                                             \
