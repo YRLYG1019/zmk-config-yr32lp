@@ -50,9 +50,48 @@ properties:
     default: [0, 0, 0, 0]
     description: Trackball LED color (R, G, B, W) set at startup.
 
+  az1uball:
+    type: boolean
+    description: |
+      The device is an AZ1UBALL. Send command 0x90 (normal count mode) at
+      startup, so a previously enabled acceleration mode is turned off.
+
   az1uball-accel:
     type: boolean
     description: |
       AZ1UBALL only. Send command 0x91 at startup to enable the ball's own
       acceleration mode (counts 1/2/3 per edge depending on rotation speed).
-      Without it the ball stays in normal mode (0x90, 1 per edge).
+      It also weights jitter on the opposite sensor, which can move the
+      cursor backwards; prefer accel-window-polls.
+
+  accel-window-polls:
+    type: int
+    default: 0
+    description: |
+      Driver-side acceleration. Speed is the count over the last N polls,
+      measured after subtracting opposite directions. 0 = off (max 16).
+
+  accel-step-percent:
+    type: int
+    default: 100
+    description: Multiplier increase per count above 1 in the window.
+
+  accel-max-percent:
+    type: int
+    default: 300
+    description: Upper limit of the acceleration multiplier.
+
+  reject-reverse-ms:
+    type: int
+    default: 0
+    description: |
+      Per axis, hold counts opposite to the last movement direction if they
+      arrive within this many ms of the last accepted count (sensor jitter
+      on the opposite sensor). Held counts are dropped when movement in the
+      original direction continues, and released together once they reach
+      reverse-counts (a real reversal). 0 = off.
+
+  reverse-counts:
+    type: int
+    default: 3
+    description: Opposite counts needed to accept a reversal within reject-reverse-ms.
