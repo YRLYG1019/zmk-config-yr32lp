@@ -53,6 +53,11 @@ trackball: trackball@a {
 };
 ```
 
+### スクロール(yr32lp.keymap)
+
+Fn レイヤー中(C か D を長押し)は、トラックボールで画面スクロールします(ボールを上 = 上にスクロール)。
+速さは `&trackball_listener` の `<&zip_scroll_scaler 1 32>` で調整します(速すぎるときは 32 を大きく、遅すぎるときは小さく)。
+
 ## QMK版との違い
 
 - `MT(MO(1),KC_V)` などは QMK では Ctrl/Shift のモッドタップになってしまう書き方のため、
